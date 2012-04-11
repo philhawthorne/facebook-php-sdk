@@ -192,6 +192,13 @@ abstract class BaseFacebook
    * @var string
    */
   protected $accessToken = null;
+  
+  /**
+   * The OAuth access token expiry. 
+   *
+   * @var int
+   */
+  protected $accessTokenExpiry = null;
 
   /**
    * Indicates if the CURL based @ syntax for file uploads is enabled.
@@ -354,6 +361,19 @@ abstract class BaseFacebook
     }
 
     return $this->accessToken;
+  }
+  
+  /**
+   * Gets the access token expiry in seconds, if available
+   * 
+   * @author Phil Hawthorne <phil@myguestlist.com.au>
+   * @return int	Returns an amount of seconds this access token is valid for, or false if no expiry is available
+   */
+  public function getAccessTokenExpiry() {
+  	if ($this->accessTokenExpiry !== null)
+  		return $this->accessTokenExpiry;
+	
+	return false; //No access token expire time available, return false
   }
 
   /**
@@ -727,9 +747,10 @@ abstract class BaseFacebook
     if (!isset($response_params['access_token'])) {
       return false;
     }
-
+    $this->accessTokenExpiry = !empty($response_params['expires']) ? $response_params['expires'] : null;
     return $response_params['access_token'];
   }
+  
 
   /**
    * Invoke the old restserver.php endpoint.
